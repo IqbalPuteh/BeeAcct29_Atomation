@@ -1,4 +1,4 @@
-﻿namespace DSZahirDesktop
+﻿namespace BeeAcct29_Automation
 {
     public abstract class UtilityClass
     {

@@ -4,7 +4,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace DSZahirDesktop
+namespace BeeAcct29_Automation
 {
     internal class clsSearch
     {
@@ -16,7 +16,7 @@ namespace DSZahirDesktop
             resY = y;
         }
 
-        private static Point abspoint(Point pnt, Int32 resX, Int32 resY)
+        private  Point abspoint(Point pnt, Int32 resX, Int32 resY)
         {
             // Convert center point to InputSimulator library version (scale of 65535)
             Point abspnt = new Point((pnt.X * 65535) / resX, (pnt.Y * 65535) / resY);
@@ -63,7 +63,7 @@ namespace DSZahirDesktop
             return isFound;
         }
 
-        static Rectangle FindImageOnScreen(Bitmap imgToFind, Bitmap screenMatch, out bool isFound)
+        Rectangle FindImageOnScreen(Bitmap imgToFind, Bitmap screenMatch, out bool isFound)
         {
             isFound = false;
             BitmapData imgBmd = imgToFind.LockBits(new Rectangle(0, 0, imgToFind.Width, imgToFind.Height), ImageLockMode.ReadOnly, imgToFind.PixelFormat);
@@ -114,35 +114,43 @@ namespace DSZahirDesktop
 
         static Rectangle EmguMatch(String ImgToFind1, String screenMatch, out bool isFound)
         {
-            isFound = false;
-            // Load template and source images
-            Image<Bgr, byte> template = new Image<Bgr, byte>(@ImgToFind1);
-            Image<Bgr, byte> source = new Image<Bgr, byte>(@screenMatch);
-
-            // Perform template matching
-            using (Emgu.CV.Image<Gray, float> result = source.MatchTemplate(template, Emgu.CV.CvEnum.TemplateMatchingType.CcoeffNormed))
+            try
             {
-                double[] minValues, maxValues;
-                Point[] minLocations, maxLocations;
-                result.MinMax(out minValues, out maxValues, out minLocations, out maxLocations);
+                isFound = false;
+                // Load template and source images
+                Image<Bgr, byte> template = new Image<Bgr, byte>(@ImgToFind1);
+                Image<Bgr, byte> source = new Image<Bgr, byte>(@screenMatch);
 
-                // You can try different values of the threshold. I guess somewhere between 0.75 and 0.95 would be good.
-                if (maxValues[0] > 0.90)
+                // Perform template matching
+                using (Emgu.CV.Image<Gray, float> result = source.MatchTemplate(template, Emgu.CV.CvEnum.TemplateMatchingType.CcoeffNormed))
                 {
-                    // This is a match. Return the position.
-                    //return maxLocations[0];
-                    //return true;
-                    Rectangle Rect = new Rectangle(new Point(maxLocations[0].X, maxLocations[0].Y), template.Size);
-                    isFound = true;
-                    return Rect;
+                    double[] minValues, maxValues;
+                    Point[] minLocations, maxLocations;
+                    result.MinMax(out minValues, out maxValues, out minLocations, out maxLocations);
+
+                    // You can try different values of the threshold. I guess somewhere between 0.75 and 0.95 would be good.
+                    if (maxValues[0] > 0.90)
+                    {
+                        // This is a match. Return the position.
+                        //return maxLocations[0];
+                        //return true;
+                        Rectangle Rect = new Rectangle(new Point(maxLocations[0].X, maxLocations[0].Y), template.Size);
+                        isFound = true;
+                        return Rect;
+                    }
                 }
+                //Template not found
+                Rectangle rect = Rectangle.Empty;
+                return rect;
             }
-            //Template not found
-            Rectangle rect = Rectangle.Empty;
-            return rect;
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
 
-        static bool IsInCapture(Bitmap searchFor, Bitmap searchIn, out Point location)
+        bool IsInCapture(Bitmap searchFor, Bitmap searchIn, out Point location)
         {
             for (int x = 0; x < searchIn.Width; x++)
             {

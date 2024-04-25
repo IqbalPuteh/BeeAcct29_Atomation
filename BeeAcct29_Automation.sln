@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeAcct29_Atomation", "BeeAcct29_Atomation\BeeAcct29_Atomation.csproj", "{72781769-045F-4F2F-9084-1CCB30059D15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeAcct29_Automation", "BeeAcct29_Atomation\BeeAcct29_Automation.csproj", "{72781769-045F-4F2F-9084-1CCB30059D15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,4 @@
-﻿namespace DSZahirDesktop
+﻿namespace BeeAcct29_Automation
 {
     public class cUrlClass : IDisposable
     {

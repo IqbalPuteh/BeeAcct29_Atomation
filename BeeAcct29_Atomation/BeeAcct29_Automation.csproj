@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="Emgu.CV" Version="4.8.1.5350" />
+    <PackageReference Include="Emgu.CV.Bitmap" Version="4.8.1.5350" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.8.1.5350" />
     <PackageReference Include="FlaUI.Core" Version="4.0.0" />
     <PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
     <PackageReference Include="InputSimulatorPlus" Version="1.0.7" />
@@ -20,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ScreenImageToSearch\" />
+    <None Update="ScreenPicToSearch\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
