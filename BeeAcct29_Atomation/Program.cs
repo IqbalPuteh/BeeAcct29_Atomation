@@ -60,7 +60,7 @@ namespace BeeAcct29_Automation
             sharingfolder = appfolder + @"\" + ConfigurationManager.AppSettings["sharingfolder"];
             datapicturefolder = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["datapicturefolder"];
 #if DEBUG
-            datapicturefolder = "C:\\users\\it\\source\\repos\\beeAcct29_Atomation\\BeeAcct29_Atomation\\ScreenImageToSearch";
+            datapicturefolder = "C:\\users\\it\\source\\repos\\beeAcct29_Automation\\BeeAcct29_Atomation\\ScreenImageToSearch";
 #endif
             screenshotlogfolder = appfolder + @"\" + ConfigurationManager.AppSettings["screenshot"];
         }
@@ -236,16 +236,6 @@ namespace BeeAcct29_Automation
                     return;
                 }
 
-                if (!CloseApp(out errStep))
-                {
-                    Console.Beep();
-                    Task.Delay(500);
-                    Log.Information($"application automation failed when running app (CloseApp) on step: {errStep} !!!");
-                    return;
-                }
-
-                return;
-
                 if (!OpenReport(out errStep, "ar"))
                 {
                     Console.Beep();
@@ -261,6 +251,7 @@ namespace BeeAcct29_Automation
                     Log.Information($"application automation failed when running app (ClosingReport) on step: {errStep.ToString()}  !!!");
                     return;
                 }
+
                 if (!OpenReport(out errStep, "outlet"))
                 {
                     Console.Beep();
@@ -276,6 +267,7 @@ namespace BeeAcct29_Automation
                     Log.Information($"application automation failed when running app (ClosingWorkspace) on step: {errStep} !!!");
                     return;
                 }
+
                 if (!CloseApp(out errStep))
                 {
                     Console.Beep();
@@ -315,6 +307,7 @@ namespace BeeAcct29_Automation
         {
             try
             {
+                iSim.Mouse.MoveMouseToPositionOnVirtualDesktop(1, 1);
                 Log.Information($"Wait app loading for {Convert.ToInt32(waitappload) / 1000} sec.");
                 if (runasadmin == "Y")
                 {
@@ -331,6 +324,9 @@ namespace BeeAcct29_Automation
                 }
                 Thread.Sleep(Convert.ToInt32(waitappload));
                 Log.Information("Done waiting app to opened.");
+
+                Point pnt = new Point(0, 0);
+                SimulateMouseClick(pnt, leftClick.no);
 
                 return true;
             }
@@ -439,7 +435,7 @@ namespace BeeAcct29_Automation
                     {
                         return false;
                     }
-                    errStep += 1; 
+                    errStep += 1;
                     Thread.Sleep(2000);
 
                     isFound = findimage("2-3.rekappenjualan", out pnt);
@@ -453,7 +449,7 @@ namespace BeeAcct29_Automation
                     }
                     errStep += 1;
                     Thread.Sleep(2000);
-                    { 
+                    {
                         errStep += 1;
                         iSim.Keyboard.TextEntry(DateManipultor.GetFirstDate() + "/");
                         Thread.Sleep(1000);
@@ -479,17 +475,209 @@ namespace BeeAcct29_Automation
                         errStep += 1;
                     }
                 }
-                isFound = findimage("8-1.exporttoexcel", out pnt);
-                if (isFound)
+                else if (reportname == "ar")
                 {
-                    SimulateMouseClick(pnt, leftClick.sngl);
+                    isFound = findimage("3-1.menuar", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+
+                    isFound = findimage("3-2.laporanar", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+
+                    isFound = findimage("3-3.laporandetailar", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+
+                    isFound = findimage("3-4.laporanrekapdetailar", out pnt);
+                    if (!isFound) /* if not found then exit function */
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(3000);
+
+                    {
+                        errStep += 1;
+                        iSim.Keyboard.TextEntry(DateManipultor.GetFirstDate() + "/");
+                        Thread.Sleep(1000);
+                        errStep = 1;
+                        iSim.Keyboard.TextEntry(DateManipultor.GetPrevMonth() + "/");
+                        errStep += 1;
+                        Thread.Sleep(1000);
+                        iSim.Keyboard.TextEntry(DateManipultor.GetPrevYear());
+
+                        errStep += 1;
+                        iSim.Keyboard.KeyPress(WindowsInput.Native.VirtualKeyCode.TAB);
+                        Thread.Sleep(1000);
+
+                        errStep += 1;
+                        iSim.Keyboard.TextEntry(DateManipultor.GetLastDayOfPrevMonth() + "/");
+                        Thread.Sleep(1000);
+                        errStep += 1;
+                        iSim.Keyboard.TextEntry(DateManipultor.GetPrevMonth() + "/");
+                        Thread.Sleep(1000);
+                        errStep += 1;
+                        iSim.Keyboard.TextEntry(DateManipultor.GetPrevYear());
+                        Thread.Sleep(1000);
+                        errStep += 1;
+                    }
+
+                    /* Option check on for looking all of type of payment */
+                    isFound = findimage("3-5.semuapembayaran", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.dbl);
+                    }
+                    else
+                    {
+                        /* do nothing, because its an optional step */
+                    }
+                    errStep += 1;
+                    Thread.Sleep(2000);
+                }
+                else if (reportname == "outlet")
+                {
+                    isFound = findimage("4-1.menumaster", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+
+                    isFound = findimage("4-2.laporanmitrabisnis", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+
+                    isFound = findimage("4-3.laporandaftarmitra", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+
+                    isFound = findimage("4-4.combobox", out pnt);
+                    if (isFound) /* if not found then exit function */
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(3000);
+                    {
+                        iSim.Keyboard.KeyPress(WindowsInput.Native.VirtualKeyCode.VK_C);
+                        Thread.Sleep(1000);
+                        errStep += 1;
+                    }
+
+
+                }
+
+                if (reportname == "outlet")
+                {
+                    isFound = findimage("4-5.previewbutton", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(5000);
+
+                    isFound = findimage("8-0.exporticon", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+
+                    {
+                        iSim.Keyboard.KeyPress(WindowsInput.Native.VirtualKeyCode.TAB);
+                        errStep += 1;
+                        Thread.Sleep(2000);
+
+                        for (int i = 0; i < 6; i++)
+                        {
+                            iSim.Keyboard.KeyPress(WindowsInput.Native.VirtualKeyCode.DOWN);
+                            Thread.Sleep(1000);
+                        }
+                        errStep += 1;
+                        iSim.Keyboard.KeyPress(WindowsInput.Native.VirtualKeyCode.RETURN);
+                        errStep += 1;
+                        Thread.Sleep(1000);
+                        iSim.Keyboard.ModifiedKeyStroke(WindowsInput.Native.VirtualKeyCode.SHIFT, WindowsInput.Native.VirtualKeyCode.TAB);
+                        errStep += 1;
+                        Thread.Sleep(1000);
+                    }
                 }
                 else
                 {
-                    return false;
+                    isFound = findimage("8-1.exporttoexcel", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
                 }
-                errStep += 1;
-                Thread.Sleep(1000);
+
 
                 var excelname = "";
                 switch (reportname)
@@ -531,7 +719,7 @@ namespace BeeAcct29_Automation
                 errStep += 1;
                 Thread.Sleep(2000);
 
-                /* Checkong OPTIONAL app question when saving and overiting existing xls report file  */
+                /* Checking OPTIONAL app question when saving and overiting existing xls report file  */
                 isFound = findimage("8-4.alreadyexist", out pnt);
                 if (isFound)
                 {
@@ -545,18 +733,21 @@ namespace BeeAcct29_Automation
                 errStep += 1;
                 Thread.Sleep(1000);
 
-                isFound = findimage("8-3.saveok", out pnt);
-                if (isFound)
+                if (reportname != "outlet")
                 {
-                    SimulateMouseClick(pnt, leftClick.sngl);
-                }
-                else
-                {
-                    return false;
-                }
-                errStep += 1;
-                Thread.Sleep(1000);
 
+                    isFound = findimage("8-3.saveok", out pnt);
+                    if (isFound)
+                    {
+                        SimulateMouseClick(pnt, leftClick.sngl);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    errStep += 1;
+                    Thread.Sleep(1000);
+                }
                 //* Pause the app to wait file saving is finished *//
                 DateTime startTime = DateTime.Now;
                 Thread.Sleep(1000);
@@ -583,6 +774,7 @@ namespace BeeAcct29_Automation
             }
         }
 
+
         static bool ClosingReport(out int errStep)
         {
             Point pnt = new Point(0, 0);
@@ -590,7 +782,7 @@ namespace BeeAcct29_Automation
             errStep = 1;
             try
             {
-                isFound = findimage("2-4.closereport", out pnt);
+                isFound = findimage("7-1.closereport", out pnt);
                 if (isFound)
                 {
                     SimulateMouseClick(pnt, leftClick.sngl);
@@ -656,13 +848,13 @@ namespace BeeAcct29_Automation
 
                 Log.Information("Moving standart excel reports file to uploaded folder...");
                 // move excels files to Datafolder
-                var path = appfolder + @"\Master_Outlet.csv";
+                var path = appfolder + @"\Master_Outlet.xls";
                 var path2 = uploadfolder + @"\ds-" + dtID + "-" + dtName + "-" + strDsPeriod + "_OUTLET.csv";
                 File.Move(path, path2, true);
-                path = appfolder + @"\Sales_Data.csv";
+                path = appfolder + @"\Sales_Data.xls";
                 path2 = uploadfolder + @"\ds-" + dtID + "-" + dtName + "-" + strDsPeriod + "_SALES.csv";
                 File.Move(path, path2, true);
-                path = appfolder + @"\Repayment_Data.csv";
+                path = appfolder + @"\Repayment_Data.xls";
                 path2 = uploadfolder + @"\ds-" + dtID + "-" + dtName + "-" + strDsPeriod + "_AR.csv";
                 File.Move(path, path2, true);
 
