@@ -42,6 +42,15 @@ namespace BeeAcct29_Automation
         [DllImport("user32.dll")]
         private static extern bool BlockInput(bool fBlockIt);
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("gdi32.dll")]
+        public static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+
+        public const int HORZRES = 8; // Horizontal resolution in pixels
+        public const int VERTRES = 10; // Vertical resolution in pixels
+
         private static void ThisClassInit()
         {
             dtID = ConfigurationManager.AppSettings["dtID"];
@@ -128,6 +137,16 @@ namespace BeeAcct29_Automation
             return File.Exists(fullPath);
         }
 
+        private static void getScreenRes(out Int32 resX , out Int32 rexY )
+        {
+            resX = 0;
+            rexY = 0;
+
+            IntPtr hdc = GetDC(IntPtr.Zero);
+            resX = GetDeviceCaps(hdc, HORZRES);
+            rexY = GetDeviceCaps(hdc, VERTRES);
+        }
+
         static void Main(string[] args)
         {
             Int32 errStep = 0;
@@ -143,8 +162,12 @@ namespace BeeAcct29_Automation
                     resX = Convert.ToInt32(record["CurrentHorizontalResolution"]);
                     resY = Convert.ToInt32(record["CurrentVerticalResolution"]);
                 }
+                if (resX == 0 || resY == 0)
+                {
+                    getScreenRes(out resX, out resY);
+                    Console.WriteLine($"Resolution: {resX} x {resY}");
+                }
                 MySearch = new clsSearch(resX, resY);
-
                 //* Call this method to disable keyboard input
                 int maxWidth = Console.LargestWindowWidth;
                 Console.Title = "Bee Accounting Desktop Version 2.9 - Automasi - By PT FAIRBANC TECHNOLOGIEST INDONESIA";
